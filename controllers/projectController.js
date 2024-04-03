@@ -1,6 +1,7 @@
 const project = require('../models').project_model;
 const activity = require('../models').activity_model;
 const employ = require('../models').employ_model;
+const db = require('../models');
 module.exports = {
     list(req, res) {
         return project
@@ -83,7 +84,7 @@ module.exports = {
             .findAll({
                 attributes: ['id', 'title', 'description', 'state'],
                 include: [{
-                    attributes: ['id', 'descripcion'],
+                    attributes: ['id', 'description'],
                     model: activity
                 },
                 {
@@ -93,6 +94,45 @@ module.exports = {
             })
             .then((project) => res.status(200).send(project))
             .catch((error) => { res.status(400).send(error); });
+    },
+
+    listEnableFull(req, res) {
+        return project
+            .findAll({
+                attributes: ['id', 'title'],
+                include: [{
+                    attributes: ['id', 'description'],
+                    model: activity
+                },
+                {
+                    model: employ
+                }
+                ],
+                where: {
+                    state: true
+                },
+                order: [
+                    ['title', 'ASC']
+                ]
+            })
+            .then((project) => res.status(200).send(project))
+            .catch((error) => { res.status(400).send(error); });
+    },
+
+    getSQL(req, res) {
+
+        return db.sequelize.query("SELECT * FROM project")
+            .then((result) => {
+                console.log(result);
+                if (!result) {
+                    return res.status(404).send({
+                        message: 'result Not Found',
+                    });
+                }
+                return res.status(200).send(result[0]);
+            })
+            .catch((error) =>
+                res.status(400).send(error));
     },
 
 

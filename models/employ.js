@@ -51,5 +51,11 @@ module.exports = sequelize => {
 
   };
   const EmployModel = sequelize.define("employ_model", attributes, options);
+  EmployModel.associate = function (models) {
+    EmployModel.hasMany(models.project_model, {
+      foreignKey: 'id_per_res'
+    });
+  };
+
   return EmployModel;
 };
